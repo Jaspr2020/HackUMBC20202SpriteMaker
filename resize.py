@@ -14,7 +14,11 @@ im = Image.open(filename)
 # Gets user input of whether to remove the background of the image or not
 remove_bg = ""
 while remove_bg != "yes" and remove_bg != "no":
-    remove_bg = input("Remove background? (yes/no)")
+    remove_bg = input("Remove background? (yes/no): ")
+# Gets user input of whether to indlude an outline
+outline = ""
+while outline != "yes" and outline != "no":
+    outline = input("Add outline? (yes/no): ")
 # Gets user input to determine which pizelerization method to be used
 size_or_scale = ""
 while size_or_scale != "size" and size_or_scale != "scale":
@@ -25,7 +29,7 @@ dimension = im.size
 # If the imaeg will be resized set the dimension to 1000, 1000
 if size_or_scale == "size":
     # The dimensions of the image that gets averaged
-    dimension = (int(1000), int(1000))
+    dimension = (1000, 1000)
     # Resizes image
     im = im.resize(dimension, resample=0) 
 
@@ -40,20 +44,18 @@ if remove_bg == "yes":
     im = Image.open("noBack.jpg")
     img = cv2.imread("noBack.jpg")
 
-# Outline algorithm
-gray_Img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-orig_blur = cv2.GaussianBlur(gray_Img, (21, 21), 0)
-sketchy = cv2.divide(gray_Img, orig_blur, scale = 256.0)
-cv2.imwrite("pencil.jpg", sketchy)
+if outline == "yes":
+    # Outline algorithm
+    gray_Img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    orig_blur = cv2.GaussianBlur(gray_Img, (21, 21), 0)
+    sketchy = cv2.divide(gray_Img, orig_blur, scale = 256.0)
+    cv2.imwrite("pencil.jpg", sketchy)
+    im2 = Image.open("pencil.jpg")
+    im2 = im2.resize((dimension[0], dimension[1]), resample=0) 
 
-# Open the images as PIL images
-im2 = Image.open("pencil.jpg")
-im2 = im2.resize((dimension[0], dimension[1]), resample=0) 
-
-# Get pixels from both images 
-# Makes array of tuples out of the image
+# Makes array of RGB tuples out of the image
 pixels = im.load()
-pixels2 = im2.load()
+# pixels2 = im2.load()
 draw = ImageDraw.Draw(im)
 
 # Get scaling factor 
@@ -94,7 +96,6 @@ for i in range(ratio[0]):
                 gsum += pixels[(i * jump[0]) + k,(j * jump[1]) + l][1]
                 bsum += pixels[(i * jump[1]) + k,(j * jump[1]) + l][2]
 
-    
         # Sets color of square to average of pixels
         fill =(round(rsum/(jump[0] * jump[1])), round(gsum/(jump[0] * jump[1])), round(bsum/(jump[0] * jump[1])))
         
@@ -110,12 +111,17 @@ while save != "yes" and save != "no":
     save = input("Save? (yes/no): ")
 # Save the image with info about it
 if save == "yes":
+    name = filename.split('.')
     extra = ""
+    if remove_bg == "yes":
+        extra += "_nobg"
+    if outline == "yes":
+        extra += "_outline"
     if size_or_scale == "size":
-        extra = str(size) + "x" + str(size)
+        extra += "_" + str(size[0]) + "x" + str(size[1])
     elif size_or_scale == "scale":
-        extra = str(scale_factor)
-    im.save(filename+extra+".jpg")
+        extra += "_" + str(scale_factor)
+    im.save(name[0] + extra + "_.jpg")
 
 # Closes file
 im.close()
