@@ -73,11 +73,12 @@ jump = (int(dimension[0] / size[0]), int(dimension[1] / size[1]))
 ratio = (int(dimension[0] / jump[0]), int(dimension[1] / jump[1]))
 
 # Make the pixel black for the original image everywhere there is an outline
+count = 0
 if outline == "yes":
-    for i in range(size[0]):
-        for j in range(size[1]):
-            if pixels2[(i * jump[0]),(j * jump[1])] < 100:
-                pixels[(i * jump[0]),(j * jump[1])] = (255, 255, 255)
+    for i in range(dimension[0]):
+        for j in range(dimension[1]):
+            if pixels2[(i),(j)] < 240:
+                pixels[(i),(j)] = (0, 0, 0)
 
 # Loops for each row of squares
 for i in range(ratio[0]):
@@ -101,7 +102,7 @@ for i in range(ratio[0]):
         
         # Draws square
         draw.rectangle((i * jump[0], j * jump[1], (i * jump[0]) + jump[0], (j * jump[1]) + jump[1]), fill, outline=None)
-    
+
 # Shows image
 im.show()
 
