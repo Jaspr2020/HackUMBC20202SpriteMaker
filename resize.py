@@ -6,10 +6,10 @@ from cvzone.SelfiSegmentationModule import SelfiSegmentation
 
 segmentor = SelfiSegmentation()
 
-filename = "Dog.png"
+filename = "HDrum.jpg"
 im = Image.open(filename)
 
-# Gets user input pip
+# Gets user input
 size_or_scale = input("Size or Scale: ")
 
 dimension = im.size
@@ -25,12 +25,15 @@ elif size_or_scale == "scale":
 # read in image
 img = cv2.imread(filename)
 
-img = segmentor.removeBG(img, (255, 255, 255), threshold=0.4)
-cv2.imwrite("noBack.jpg", img)
+remove_bg = input("Remove background? (yes/no)")
+if remove_bg == "yes":
+    img = segmentor.removeBG(img, (255, 255, 255), threshold=0.4)
+    cv2.imwrite("noBack.jpg", img)
 
-noBackIm = Image.open("noBack.jpg")
+    im = Image.open("noBack.jpg")
 
-img = cv2.imread("noBack.jpg")
+    img = cv2.imread("noBack.jpg")
+
 # convert to grayscale
 gray_Img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -49,9 +52,7 @@ if size_or_scale == "size":
 #im2.show()
 #cv2.wait(0)
 # Makes array of tuples out of the image
-pixels = noBackIm.load()
-
-
+pixels = im.load()
 pixels2 = im2.load()
 
 draw = ImageDraw.Draw(im)
@@ -78,7 +79,7 @@ elif size_or_scale == "scale":
             for k in range(jump[0]):
                 for l in range(jump[1]):
                     sum = pixels[(i * jump[0]) + k,(j * jump[1]) + l][0] + pixels[(i * jump[0]) + k,(j * jump[1]) + l][1] + pixels[(i * jump[0]) + k,(j * jump[1]) + l][2]
-                    if sum < 50 * 3:
+                    if sum < 100:
                         pixels[(i * jump[0]) + k,(j * jump[1]) + l] = (0, 0, 0)
 
 
@@ -134,6 +135,10 @@ if size_or_scale == "scale":
     
 # Shows image
 im.show()
+
+save = input("Save? (yes/no): ")
+if save == "yes":
+    im.save("Pixelerated.jpg")
 
 # Closes file
 im.close()
