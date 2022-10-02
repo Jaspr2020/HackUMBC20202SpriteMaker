@@ -52,10 +52,10 @@ if outline == "yes":
     cv2.imwrite("pencil.jpg", sketchy)
     im2 = Image.open("pencil.jpg")
     im2 = im2.resize((dimension[0], dimension[1]), resample=0) 
+    pixels2 = im2.load()
 
 # Makes array of RGB tuples out of the image
 pixels = im.load()
-# pixels2 = im2.load()
 draw = ImageDraw.Draw(im)
 
 # Get scaling factor 
@@ -71,13 +71,13 @@ size = (int(dimension[0] / scale_factor), int(dimension[1] / scale_factor))
 # The amount of mixels to jump for the pixelerized image
 jump = (int(dimension[0] / size[0]), int(dimension[1] / size[1]))
 ratio = (int(dimension[0] / jump[0]), int(dimension[1] / jump[1]))
-for i in range(ratio[0]):
-    for j in range(ratio[1]):
-        for k in range(jump[0]):
-            for l in range(jump[1]):
-                sum = pixels[(i * jump[0]) + k,(j * jump[1]) + l][0] + pixels[(i * jump[0]) + k,(j * jump[1]) + l][1] + pixels[(i * jump[0]) + k,(j * jump[1]) + l][2]
-                if sum < 100:
-                    pixels[(i * jump[0]) + k,(j * jump[1]) + l] = (0, 0, 0)
+
+# Make the pixel black for the original image everywhere there is an outline
+if outline == "yes":
+    for i in range(size[0]):
+        for j in range(size[1]):
+            if pixels2[(i * jump[0]),(j * jump[1])] < 100:
+                pixels[(i * jump[0]),(j * jump[1])] = (255, 255, 255)
 
 # Loops for each row of squares
 for i in range(ratio[0]):
